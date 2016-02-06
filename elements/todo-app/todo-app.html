@@ -93,29 +93,27 @@
 
       <div class="task-container">
       
-      <template id="listTemplate" is="dom-repeat" filter="listFilter" items="{{tasks}}" index-as="i">
+        <template id="listTemplate" is="dom-repeat" filter="listFilter" items="{{tasks}}" index-as="i">
 
-     
-      <div class="item-container">
-        <paper-checkbox checked="{{item.completed}}" on-tap="update"></paper-checkbox>
-        <div class="item-content">
-        <paper-input id$="input{{i}}" class$="hidden {{isEditing(item.editing)}}" label="" value="{{item.name}}" on-change="editName" on-keyup="editingName"></paper-input>
-        <span class$="{{isCompleted(item.completed, item.editing)}}" on-dblclick="editName">{{item.name}}</span>
-        </div>
-        <paper-icon-button icon="close" on-tap="removeTask"></paper-icon-button>
-       </div>  
-      
-      </template>
+          <div class="item-container">
+            <paper-checkbox checked="{{item.completed}}" on-tap="update"></paper-checkbox>
+              <div class="item-content">
+                <paper-input id$="input{{i}}" class$="hidden {{isEditing(item.editing)}}" label="" value="{{item.name}}" on-change="editName" on-keyup="editingName"></paper-input>
+                <span class$="{{isCompleted(item.completed, item.editing)}}" on-dblclick="editName">{{item.name}}</span>
+              </div>
+            <paper-icon-button icon="close" on-tap="removeTask"></paper-icon-button>
+          </div>  
+        
+        </template>
     
       </div>
  
     </paper-material>
     
-    <paper-toast text={{alert}} id="toast"></paper-toast>
+  <paper-toast text={{alert}} id="toast"></paper-toast>
   
   </template>
   
-
   <script>
     Polymer({
       is: 'todo-app',
