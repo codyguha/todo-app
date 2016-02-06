@@ -83,7 +83,7 @@
       
       <h1>Grocery List</h1>
     
-      <paper-input required error-message="needs some text!" label="Add Grocery Item to List..." value="{{taskName}}" on-keyup="addTask" id="mainInput"></paper-input> 
+      <paper-input required error-message="Enter item name!" label="Add Grocery Item to List..." value="{{taskName}}" on-keyup="addTask" id="mainInput"></paper-input> 
 
       <paper-tabs id="tabs" selected={{tab}}>
         <paper-tab>ALL<span class="count">{{tasks.length}}</span></paper-tab>
@@ -136,7 +136,6 @@
       },
       ready: function(e){
         var tasks = JSON.parse(localStorage.getItem("tasks"))
-        console.log(tasks)
         if (tasks.length) {
           this.tasks = tasks
           this.update()
