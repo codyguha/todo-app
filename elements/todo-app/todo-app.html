@@ -130,7 +130,7 @@
       },
       ready: function(e){
         var tasks = JSON.parse(localStorage.getItem("tasks"))
-        if (tasks.length) {
+        if (tasks && tasks.length) {
           this.tasks = tasks
           this.update()
         }
