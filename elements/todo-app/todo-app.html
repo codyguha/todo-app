@@ -3,54 +3,119 @@
 <link rel="import" href="/bower_components/paper-fab/paper-fab.html">
 <link rel="import" href="/bower_components/paper-input/paper-input.html">
 <link rel="import" href="/bower_components/iron-icons/iron-icons.html">
-<link rel="import" href="/elements/todo-app/task-item.html">
 <link rel="import" href="/bower_components/paper-toast/paper-toast.html">
 <link rel="import" href="/bower_components/paper-card/paper-card.html">
 <link rel="import" href="/bower_components/paper-button/paper-button.html">
+<link rel="import" href="/bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="/bower_components/paper-menu/paper-menu.html">
+<link rel="import" href="/bower_components/paper-listbox/paper-listbox.html">
+<link rel="import" href="/bower_components/paper-checkbox/paper-checkbox.html">
+<link rel="import" href="/bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="/bower_components/paper-tabs/paper-tabs.html">
+<link rel="import" href="/elements/todo-app/task-item.html">
+
 <dom-module id="todo-app">
+  
   <template>
+    
     <style>
       :host {
         display: block;
         padding: 1em;
+        @apply(--layout-vertical);
+        @apply(--layout-center);
+        font-family: 'Roboto', 'Noto', sans-serif;
+        --paper-tab-ink: var(--paper-pink-500);
+        --paper-tabs-selection-bar-color: var(--paper-pink-500);
       }
-      .list-input{
+      .container{
+        width: 500px;
         padding: 1em;
-        margin-bottom: 1em;
+        background-color: white;
       }
       .task-container{
         @apply(--layout-vertical);
+        margin-top: 1em;
       }
       .task-card{
         margin-bottom: 1em;
+        padding: 1em;
+      }
+      .item-container{
+        width: 100%;
+        @apply(--layout-horizontal);
+        @apply(--layout-center);
+        height: 3em;
+      }
+      .item-content{
+        @apply(--layout-horizontal);
+        @apply(--layout-center);
+        @apply(--layout-flex);
+        
       }
       .add-fab{
         margin-left: auto;
       }
+      .completed{
+        text-decoration: line-through;
+        opacity: .3;
+      }
+      .count {
+        margin-left: 30px;
+        height: 2em;
+        width: 2em;
+        @apply(--layout-horizontal);
+        @apply(--layout-center);
+        @apply(--layout-center-justified);
+        color: white;
+        border-radius: 100%;
+        background-color: var(--paper-pink-500);
+      }
+      .hidden{
+        display:none;
+      }
+      .editing{
+        display: inline-block;
+      }
     </style>
-    <paper-material class="list-input" elevation="2">
-      <h1>List</h1>
+  
+    <paper-material class="container" elevation="5">
       
-      <paper-input label="task" value="{{taskName}}"></paper-input>
-      <paper-fab class="add-fab" icon="add" on-tap="addTask"></paper-fab>
+      <h1>Grocery List</h1>
+    
+      <paper-input required error-message="needs some text!" label="Add Grocery Item to List..." value="{{taskName}}" on-keyup="addTask" id="mainInput"></paper-input> 
+
+      <paper-tabs id="tabs" selected={{tab}}>
+        <paper-tab>ALL<span class="count">{{tasks.length}}</span></paper-tab>
+        <paper-tab>ACTIVE<span class="count">{{totalActive}}</span></paper-tab>
+        <paper-tab>COMPLETED<span class="count">{{totalCompleted}}</span></paper-tab>
+      </paper-tabs>
+
+      <div class="task-container">
+      
+      <template id="listTemplate" is="dom-repeat" filter="listFilter" items="{{tasks}}" index-as="i">
+
+     
+      <div class="item-container">
+        <paper-checkbox checked="{{item.completed}}" on-tap="update"></paper-checkbox>
+        <div class="item-content">
+        <paper-input id$="input{{i}}" class$="hidden {{isEditing(item.editing)}}" label="" value="{{item.name}}" on-change="editName" on-keyup="editingName"></paper-input>
+        <span class$="{{isCompleted(item.completed, item.editing)}}" on-dblclick="editName">{{item.name}}</span>
+        </div>
+        <paper-icon-button icon="close" on-tap="removeTask"></paper-icon-button>
+       </div>  
+      
+      </template>
+    
+      </div>
+ 
     </paper-material>
     
-    <div class="task-container">
-      <template is="dom-repeat" items="{{tasks}}" index-as="i">
-        <paper-card class="task-card" image="" elevation="1" animated-shadow="false">
-          <div class="card-content">
-            <task-item task-name="{{item}}"></task-item>
-          </div>
-          <div class="card-actions">
-            <paper-button raised on-tap="removeTask">remove</paper-button>
-          </div>
-        </paper-card>        
-
-
-      </template>
-    </div>
-    <paper-toast text="Please enter task." id="taskError"></paper-toast>
+    <paper-toast text={{alert}} id="toast"></paper-toast>
+  
   </template>
+  
+
   <script>
     Polymer({
       is: 'todo-app',
@@ -61,19 +126,111 @@
         },
         taskName: {
           type: String
+        },
+        alert: {
+          type: String,
+        },
+        tab: {
+          type: Number,
+          value: 0,
+          observer: "_tabChanged"
+        },
+      },
+      ready: function(e){
+        var tasks = JSON.parse(localStorage.getItem("tasks"))
+        console.log(tasks)
+        if (tasks.length) {
+          this.tasks = tasks
+          this.update()
         }
       },
+      computeCompleted: function() {
+        var n = 0
+        this.tasks.forEach(function(task) {
+          if (task.completed) {
+            n++
+          }
+        });
+        this.set("totalCompleted", n)
+        this.set("totalActive", this.tasks.length - n)
+      },
+      _tabChanged: function(d) {
+        this.computeCompleted()
+        this.$.listTemplate.render()
+      },
+      update: function(e){
+        localStorage.setItem("tasks", JSON.stringify(this.tasks))
+        this.computeCompleted()
+        this.$.listTemplate.render()
+      },
+      editName: function(e){
+        var i = e.model.get("i")
+        var editing = this.tasks[i].editing
+        this.set("tasks." + i + ".editing", !editing)
+        if (!editing){
+          this.$$("#input"+i).focus()
+        }
+      },
+      isEditing: function(a){
+        if (a) {
+          return "editing"
+        }
+      },
+      editingName:function(e){
+        if(e.keyCode===13){
+          window.focus()
+        }
+      },
+      isPlural: function(n){
+        return n === 1 ? n = n+" item" : n = n + " items"
+      },
       addTask: function(e){
-        var task = this.taskName
-        if (task) {
-          this.push("tasks", task)
-        } else {
-          this.$.taskError.show()
+        if (e.keyCode === 13) {
+          this.$.mainInput.validate()
+          var task = {name: this.taskName, completed: false, editing: false}
+          if (task.name) {
+            this.push("tasks", task)
+            var n = this.isPlural( this.tasks.length )
+            this.set("alert", task.name +" added. " + n + " on the list.")
+          } else {
+            this.set("alert", "Not Added. Enter grocery item name")
+          }
+          this.set("taskName", "")
+          window.focus()
+          this.$.toast.show()
+          this.update()
         }
       },
       removeTask: function(e){
         var i = e.model.get("i")
+        var task = e.model.get("item")
         this.splice("tasks", i, 1)
+        var n = this.isPlural( this.tasks.length )
+        this.set("alert", task.name +" removed. " + n + " on the list.")
+        this.$.toast.show()
+        this.update()
+      },
+      listFilter: function(e){
+        var selected = +this.$.tabs.selected
+        switch (selected) {
+          case 0:
+            return true;
+          break;
+          case 1:
+            if (!e.completed) return true;
+          break;
+          case 2:
+            if (e.completed) return true;
+          break;
+        }
+      },
+      isCompleted: function(a, b){
+        if (b) {
+          return "hidden"
+        }
+        if (a) {
+          return "completed"
+        } 
       }
     });
   </script>
