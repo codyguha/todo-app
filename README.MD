@@ -13,4 +13,6 @@
 * computed remaining/completed task count
 * vulcanized elements
 
+[Demo](http://codyguha.github.io/todo-app/)
+
 cody guha
