@@ -8,24 +8,7 @@
 <link rel="import" href="/bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="/bower_components/paper-tabs/paper-tabs.html">
 
-<script src="https://js.pusher.com/3.0/pusher.min.js"></script>
-  <script>
-    // Enable pusher logging - don't include this in production
-    Pusher.log = function(message) {
-      if (window.console && window.console.log) {
-        window.console.log(message);
-      }
-    };
 
-    var pusher = new Pusher('60c8a88c281cfca8a203', {
-      encrypted: true
-    });
-    var channel = pusher.subscribe('test_channel');
-    channel.bind('my_event', function(data) {
-      alert(data.message);
-      console.log(data.message);
-    });
-  </script>
 
 
 <dom-module id="todo-app">
@@ -223,6 +206,19 @@
             this.push("tasks", task)
             var n = this.isPlural( this.tasks.length )
             this.set("alert", task.name +" added. " + n + " on the list.")
+            var Pusher = require('pusher');
+
+            var pusher = new Pusher({
+              appId: '182637',
+              key: '60c8a88c281cfca8a203',
+              secret: '70067fc28de90cdd3d1c',
+              encrypted: true
+            });
+            pusher.port = 443;
+
+            pusher.trigger('test_channel', 'my_event', {
+              "message": task.name + "added. "
+            });
 
           } else { 
             this.set("alert", "Not Added. Enter item name")
@@ -264,8 +260,8 @@
           return "completed"
         } 
       },
-
     });
+    
   </script>
   
 </dom-module>
