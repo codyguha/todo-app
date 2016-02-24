@@ -27,6 +27,7 @@
     var channel = pusher.subscribe('test_channel');
     channel.bind('my_event', function(data) {
       alert(data.message);
+      this.set("alert", data.message)
     });
   </script>
   
@@ -128,13 +129,6 @@
     </paper-material>
     
   <paper-toast text={{alert}} id="toast"></paper-toast>
-  
-  <core-pubnub 
-        publish_key="pub-c-a0e8f1b8-1ce7-4132-b421-7ee93f4b8002" 
-        subscribe_key="sub-c-30e3f698-cb27-11e5-bcee-0619f8945a4f">
-        <core-pubnub-publish id="pub" channel="todo" message="Test"> </core-pubnub-publish>
-        <core-pubnub-subscribe id="sub" channel="todo" messages="{{messages}}" presence="{{present}}" on-callback="subscribeCallback"></core-pubnub-subscribe>  
-  </core-pubnub>
 
   </template>
   
