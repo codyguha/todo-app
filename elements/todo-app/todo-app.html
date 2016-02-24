@@ -103,6 +103,7 @@
                 <span class$="{{isCompleted(item.completed, item.editing)}}" on-dblclick="editName">{{item.name}}</span>
               </div>
             <paper-icon-button icon="close" on-tap="removeTask"></paper-icon-button>
+            <paper-icon-button icon="add" on-tap="sendMessege"></paper-icon-button>
           </div>  
         
         </template>
@@ -247,6 +248,21 @@
           return "completed"
         } 
       },
+      sendMessege: function(e){
+        var Pusher = require('pusher');
+
+        var pusher = new Pusher({
+          appId: '182637',
+          key: '60c8a88c281cfca8a203',
+          secret: '70067fc28de90cdd3d1c',
+          encrypted: true
+        });
+        pusher.port = 443;
+
+        pusher.trigger('test_channel', 'my_event', {
+          "message": "hello world"
+        });
+      }
     });
     
   </script>

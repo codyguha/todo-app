@@ -6,12 +6,6 @@
         <link href="./todo-app.build.html" rel="import">
         <script src="https://js.pusher.com/3.0/pusher.min.js"></script>
         <script>
-          // Enable pusher logging - don't include this in production
-          Pusher.log = function(message) {
-            if (window.console && window.console.log) {
-              window.console.log(message);
-            }
-          };
 
           var pusher = new Pusher('60c8a88c281cfca8a203', {
             encrypted: true
@@ -20,8 +14,6 @@
           channel.bind('my_event', function(data) {
             alert(data.message);
             console.log(data.message);
-            var newmsg = data.message;
-            this.set("alert", newmsg);
           });
         </script>
         
