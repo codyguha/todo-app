@@ -20,7 +20,8 @@
           channel.bind('my_event', function(data) {
             alert(data.message);
             console.log(data.message);
-            alert = data.message
+            var newmsg = data.message;
+            this.set("alert", newmsg);
           });
         </script>
         
