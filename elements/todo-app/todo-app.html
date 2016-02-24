@@ -7,6 +7,7 @@
 <link rel="import" href="/bower_components/paper-checkbox/paper-checkbox.html">
 <link rel="import" href="/bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="/bower_components/paper-tabs/paper-tabs.html">
+<link rel="import" href="/bower_components/pubnub-element/pubnub-element.html">
 
 <dom-module id="todo-app">
   
@@ -109,6 +110,13 @@
     
   <paper-toast text={{alert}} id="toast"></paper-toast>
   
+  <core-pubnub 
+        publish_key="pub-c-a0e8f1b8-1ce7-4132-b421-7ee93f4b8002" 
+        subscribe_key="sub-c-30e3f698-cb27-11e5-bcee-0619f8945a4f">
+        <core-pubnub-publish id="pub" channel="todo" message="Test"> </core-pubnub-publish>
+        <core-pubnub-subscribe id="sub" channel="todo" messages="{{messages}}" presence="{{present}}" on-callback="subscribeCallback"></core-pubnub-subscribe>  
+  </core-pubnub>
+
   </template>
   
   <script>
@@ -129,6 +137,22 @@
           type: Number,
           value: 0,
           observer: "_tabChanged"
+        },
+        rid: {
+          type: Number,
+          value: -1
+        },
+        time: {
+          type: String,
+          value: new Date().toLocaleString()
+        },
+        messages: {
+          type: Array,
+          value: []
+        },
+        present: {
+          type: Array,
+          value: []
         },
       },
       ready: function(e){
@@ -176,7 +200,7 @@
         }
       },
       isPlural: function(n){
-        return n === 1 ? n = n+" item" : n = n + " items"
+        return n === 1 ? n = n + " item" : n = n + " items"
       },
       addTask: function(e){
         if (e.keyCode === 13) {
@@ -186,8 +210,12 @@
             this.push("tasks", task)
             var n = this.isPlural( this.tasks.length )
             this.set("alert", task.name +" added. " + n + " on the list.")
-          } else {
-            this.set("alert", "Not Added. Enter item name")
+            this.$.pub.message = this.set("alert", task.name +" added. " + n + " on the list.")
+            this.$.pub.publish();
+            console.log(this.$.pub.message)
+          } else { 
+            this.set("alert", "Not Added. Enter
+             item name")
           }
           this.set("taskName", "")
           window.focus()
@@ -225,7 +253,8 @@
         if (a) {
           return "completed"
         } 
-      }
+      },
+
     });
   </script>
 </dom-module>
