@@ -213,9 +213,9 @@
             this.$.pub.message = this.set("alert", task.name +" added. " + n + " on the list.")
             this.$.pub.publish();
             console.log(this.$.pub.message)
+            console.log(something)
           } else { 
-            this.set("alert", "Not Added. Enter
-             item name")
+            this.set("alert", "Not Added. Enter item name")
           }
           this.set("taskName", "")
           window.focus()
