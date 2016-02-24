@@ -206,20 +206,7 @@
             this.push("tasks", task)
             var n = this.isPlural( this.tasks.length )
             this.set("alert", task.name +" added. " + n + " on the list.")
-            var Pusher = require('pusher');
-
-            var pusher = new Pusher({
-              appId: '182637',
-              key: '60c8a88c281cfca8a203',
-              secret: '70067fc28de90cdd3d1c',
-              encrypted: true
-            });
-            pusher.port = 443;
-
-            pusher.trigger('test_channel', 'my_event', {
-              "message": task.name + "added. "
-            });
-
+            console.log(newmsg)
           } else { 
             this.set("alert", "Not Added. Enter item name")
           }
