@@ -16783,7 +16783,12 @@ Custom property | Description | Default
     });
   </script>
 </dom-module>
+<script src="https://js.pusher.com/3.0/pusher.min.js"></script>
+
+
+
 <dom-module id="todo-app" assetpath="/elements/todo-app/">
+
   
   <template>
     
@@ -16853,7 +16858,8 @@ Custom property | Description | Default
   
     <paper-material class="container" elevation="5">
       
-      <h1>To Do List</h1>
+      <h1>ToDoList</h1>
+      <paper-icon-button icon="add" on-tap="sendMessege"></paper-icon-button>
     
       <paper-input required="" error-message="Enter task name!" label="Enter task name..." value="{{taskName}}" on-keyup="addTask" id="mainInput"></paper-input> 
 
@@ -16883,7 +16889,7 @@ Custom property | Description | Default
     </paper-material>
     
   <paper-toast text="{{alert}}" id="toast"></paper-toast>
-  
+
   </template>
   
   <script>
@@ -16904,6 +16910,22 @@ Custom property | Description | Default
           type: Number,
           value: 0,
           observer: "_tabChanged"
+        },
+        rid: {
+          type: Number,
+          value: -1
+        },
+        time: {
+          type: String,
+          value: new Date().toLocaleString()
+        },
+        messages: {
+          type: Array,
+          value: []
+        },
+        present: {
+          type: Array,
+          value: []
         },
       },
       ready: function(e){
@@ -16951,7 +16973,7 @@ Custom property | Description | Default
         }
       },
       isPlural: function(n){
-        return n === 1 ? n = n+" item" : n = n + " items"
+        return n === 1 ? n = n + " item" : n = n + " items"
       },
       addTask: function(e){
         if (e.keyCode === 13) {
@@ -16961,7 +16983,8 @@ Custom property | Description | Default
             this.push("tasks", task)
             var n = this.isPlural( this.tasks.length )
             this.set("alert", task.name +" added. " + n + " on the list.")
-          } else {
+            console.log(newmsg)
+          } else { 
             this.set("alert", "Not Added. Enter item name")
           }
           this.set("taskName", "")
@@ -17000,7 +17023,24 @@ Custom property | Description | Default
         if (a) {
           return "completed"
         } 
+      },
+      sendMessege: function(e){
+        var Pusher = require('pusher');
+
+        var pusher = new Pusher({
+          appId: '182637',
+          key: '60c8a88c281cfca8a203',
+          secret: '70067fc28de90cdd3d1c',
+          encrypted: true
+        });
+        pusher.port = 443;
+
+        pusher.trigger('test_channel', 'my_event', {
+          "message": "hello world"
+        });
       }
     });
+    
   </script>
+  
 </dom-module></div></body></html>
